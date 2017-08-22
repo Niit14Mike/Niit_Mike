@@ -1,0 +1,22 @@
+///二维码生成action
+        public ActionResult erweima(string user_id)
+        {
+
+            string url = "http://news.dhand.cn/erjifenxiaozhuce.html?user_id2=" + user_id + "";
+            //创建二维码生成类  
+            QRCodeEncoder qrCodeEncoder = new QRCodeEncoder();
+            //设置编码模式  
+            qrCodeEncoder.QRCodeEncodeMode = QRCodeEncoder.ENCODE_MODE.BYTE;
+            //设置编码测量度  
+            qrCodeEncoder.QRCodeScale = 10;
+            //设置编码版本  
+            qrCodeEncoder.QRCodeVersion = 0;
+            //设置编码错误纠正  
+            qrCodeEncoder.QRCodeErrorCorrect = QRCodeEncoder.ERROR_CORRECTION.M;
+            //生成二维码图片  
+            System.Drawing.Bitmap image = qrCodeEncoder.Encode(url);
+            MemoryStream ms = new MemoryStream();
+            image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+            image.Dispose();
+            return File(ms.ToArray(), "image/jpeg");
+        }
