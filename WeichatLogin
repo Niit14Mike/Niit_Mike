@@ -1,0 +1,79 @@
+ public class Weichat1Controller : Controller
+    {
+        public static string Key = "";
+        // GET: Weichat
+        dhandzhaoEntities de = new dhandzhaoEntities();
+        JavaScriptSerializer jser = new JavaScriptSerializer();
+        mistake m = new mistake { msg = new iii() };
+        UserSQL s = new UserSQL();
+        UserInfo u = new UserInfo { msg = new msg() };
+
+        //mistake m = new mistake { msg = new iii() };
+        public ActionResult Index()
+        {
+            return View();
+        }
+        public static string js_ticket;
+        public static DateTime jstime;
+        public static string access_token;
+        public static DateTime accesstime;
+        //-----------------获取getticket-------------------------------//
+        public string getticket()
+        {
+            if (js_ticket == null || js_ticket == "" || (jstime - DateTime.Now).TotalSeconds < 7200)
+            {
+                string returnnews = getmethod("https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=" + getacess_token() + "&type=jsapi");
+                jsapi_ticket test = JsonConvert.DeserializeObject<jsapi_ticket>(returnnews);
+                js_ticket = test.ticket;
+                jstime = System.DateTime.Now;
+                return test.ticket;
+
+            }
+            else
+            {
+                return js_ticket;
+            }
+
+        }
+        //-----------------获取access_token-------------------------------//
+        public string gettoken()
+        {
+            return getacess_token();
+        }
+        public static string getacess_token()
+        {
+            string appid = "wx4dabcc9ded01f233";
+            string secret = "9d75e7512405aecbfb9b8b7706d44a88";
+
+            if (access_token == null || access_token == "" || (accesstime - DateTime.Now).TotalSeconds < 7200)
+            {
+                string returnnews = getmethod("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + appid + "&secret=" + secret + "");
+                Access_Token test = JsonConvert.DeserializeObject<Access_Token>(returnnews);
+                access_token = test.access_token;
+                accesstime = System.DateTime.Now;
+                return test.access_token;
+            }
+            else
+            {
+                return access_token;
+            }
+
+        }
+
+        //----------------------静态方法，获取http消息------------------------------------//
+        public static string getmethod(string url)
+        {
+            HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(url);
+            req.Method = "GET";
+            using (WebResponse wr = req.GetResponse())
+            {
+                //读取页面中的流-------------------------------------------
+                Stream reqStream = wr.GetResponseStream();
+                StreamReader sr = new StreamReader(reqStream, System.Text.Encoding.Default);
+                string news = sr.ReadToEnd();
+                reqStream.Close();//关闭当前流并释放与之关联的所有资源
+                sr.Close();
+                return news;
+                //在这里对接收到的页面内容进行处理
+            }
+        }
